@@ -17,13 +17,22 @@ namespace Shared.Base.Domain.Mediator
             _provider = provider;
         }
 
-        public async Task<TReply> Send<TReply>(ICommand<TReply> command, CancellationToken cancellationToken = default)
+        public async Task<TResponse> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default)
         {
-            var handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TReply));
+            var handlerType = typeof(ICommandHandler<,>).MakeGenericType(command.GetType(), typeof(TResponse));
             var handler = _provider.GetRequiredService(handlerType);
-            return await (Task<TReply>)handlerType
+            return await (Task<TResponse>)handlerType
                 .GetMethod("Handle")!
                 .Invoke(handler, new object[] { command, cancellationToken })!;
+        }
+
+        public async Task<TResponse> Query<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default)
+        {
+            var handlerType = typeof(IQueryHandler<,>).MakeGenericType(query.GetType(), typeof(TResponse));
+            var handler = _provider.GetRequiredService(handlerType);
+            return await (Task<TResponse>)handlerType
+                .GetMethod("Handle")!
+                .Invoke(handler, new object[] { query, cancellationToken })!;
         }
 
         public async Task Trigger(IEvent @event, CancellationToken cancellationToken = default)
@@ -39,4 +48,6 @@ namespace Shared.Base.Domain.Mediator
             }
         }
     }
+
+
 }

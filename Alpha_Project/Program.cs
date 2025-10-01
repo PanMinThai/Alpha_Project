@@ -1,3 +1,6 @@
+using Alpha_Project.Modules.Tasks.Dto;
+using Alpha_Project.Modules.Tasks.Query;
+using Alpha_Project.Modules.Tasks.QueryHandler;
 using Domain.Interfaces;
 using Infrastructure.Database;
 using Infrastructure.Repository;
@@ -17,6 +20,9 @@ builder.Services.Scan(scan => scan
     .AddClasses(c => c.AssignableTo(typeof(IEventHandler<>)))
         .AsImplementedInterfaces()
         .WithScopedLifetime()
+    .AddClasses(c => c.AssignableTo(typeof(IQueryHandler<,>)))
+        .AsImplementedInterfaces()
+        .WithScopedLifetime()
 );
 
 // DbContext
@@ -28,6 +34,7 @@ builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 // builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddScoped<IDispatcher, Dispatcher>();
+
 
 // Controllers
 builder.Services.AddControllers();

@@ -9,7 +9,8 @@ namespace Shared.Base.Domain.Mediator
 {
     public interface IDispatcher
     {
-        Task<TReply> Send<TReply>(ICommand<TReply> command, CancellationToken cancellationToken = default);
+        Task<TResponse> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default);
+        Task<TResponse> Query<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default);
         Task Trigger(IEvent @event, CancellationToken cancellationToken = default);
     }
 }

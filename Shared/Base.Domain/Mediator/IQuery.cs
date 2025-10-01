@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Shared.Base.Domain.Mediator
 {
-    public interface ICommand<TResponse> : IRequest<TResponse> { }
+    public interface IQuery<TResponse> : IRequest<TResponse> { }
 }

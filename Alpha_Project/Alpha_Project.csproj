@@ -18,10 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Modules\Tasks\Dto\" />
     <Folder Include="Modules\Tasks\DomainEventHandler\" />
-    <Folder Include="Modules\Tasks\Validator\" />
-    <Folder Include="Modules\Tasks\QueryHandler\" />
     <Folder Include="Modules\User\" />
   </ItemGroup>
 
