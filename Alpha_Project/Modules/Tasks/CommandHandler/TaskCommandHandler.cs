@@ -19,15 +19,10 @@ namespace Alpha_Project.Modules.Tasks.CommandHandler
 
         public async Task<Guid> Handle(CreateTaskCommand command, CancellationToken cancellationToken)
         {
-            var task = new TaskEntity
-            {
-                Id = Guid.NewGuid(),
-                Title = command.Title,
-                Status = command.Status,
-                DueDate = command.DueDate
-            };
+            var task = new TaskEntity(command.Title, command.DueDate);
 
             await _taskRepository.AddAsync(task);
+
             return task.Id;
         }
 
@@ -36,9 +31,7 @@ namespace Alpha_Project.Modules.Tasks.CommandHandler
             var task = await _taskRepository.GetByIdAsync(command.Id);
             if (task == null) throw new Exception("Task not found");
 
-            task.Title = command.Title;
-            task.Status = command.Status;
-            task.DueDate = command.DueDate;
+            task.Update(command.Title, command.DueDate, command.Status);
 
             await _taskRepository.UpdateAsync(task);
             return task.Id;

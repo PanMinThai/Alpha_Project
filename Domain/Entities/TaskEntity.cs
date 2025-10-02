@@ -12,53 +12,38 @@ using System.Threading.Tasks;
 namespace Domain.Entities
 {
     public class TaskEntity : IdEntity<Guid>
-{
-    public Guid CreatedBy { get; private set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
-    public string? Title { get; set; }
-    public DateTime? DueDate { get; set; }
-    public AppTaskStatus Status { get; set; } = AppTaskStatus.InProgress;
-
-    public void Created(string title, Guid createdBy, DateTime? dueDate = null)
     {
-        Id = Guid.NewGuid();
-        Title = title;
-        CreatedBy = createdBy;
-        CreatedAt = DateTime.UtcNow;
-        DueDate = dueDate;
+        public DateTime CreatedAt { get; private set; }
+        public DateTime UpdatedAt { get; private set; }
+        public string? Title { get; private set; }
+        public DateTime? DueDate { get; private set; }
+        public AppTaskStatus Status { get; private set; } = AppTaskStatus.InProgress;
 
-        AddDomainEvent(new TaskCreatedDomainEvent
+        private TaskEntity() { } 
+
+        public TaskEntity(string title, DateTime? dueDate)
         {
-            TaskId = Id,
-            Title = Title,
-            CreatedBy = CreatedBy,
-            DueDate = DueDate,
-            Status = Status
-        });
-    }
+            Id = Guid.NewGuid();
+            Title = title;
+            DueDate = dueDate;
+            CreatedAt = DateTime.UtcNow;
+            UpdatedAt = DateTime.UtcNow;
 
-    public void Update(string title, DateTime? dueDate)
-    {
-        Title = title;
-        DueDate = dueDate;
-        UpdatedAt = DateTime.UtcNow;
-
-        AddDomainEvent(new TaskUpdatedDomainEvent
+            AddDomainEvent(new TaskCreatedDomainEvent(Id, Title));
+        }
+        public void Update(string title, DateTime? dueDate, AppTaskStatus status)
         {
-            TaskId = Id,
-            Title = Title,
-            DueDate = DueDate,
-            Status = Status
-        });
+            Title = title;
+            DueDate = dueDate;
+            Status = status;
+            UpdatedAt = DateTime.UtcNow;
+
+            AddDomainEvent(new TaskUpdatedDomainEvent(Id, Title, Status));
+        }
+        public void Delete()
+        {
+            AddDomainEvent(new TaskDeletedDomainEvent(Id));
+        }
     }
 
-    public void Complete()
-    {
-        Status = AppTaskStatus.Completed;
-        UpdatedAt = DateTime.UtcNow;
-
-        AddDomainEvent(new TaskCompletedDomainEvent { TaskId = Id });
-    }
-}
 }

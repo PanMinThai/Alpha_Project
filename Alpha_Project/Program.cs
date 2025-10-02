@@ -4,9 +4,11 @@ using Alpha_Project.Modules.Tasks.QueryHandler;
 using Domain.Interfaces;
 using Infrastructure.Database;
 using Infrastructure.Repository;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using Shared.Base.Domain.Mediator;
+using Shared.Base.Infra.Interfaces;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +37,9 @@ builder.Services.AddScoped<ITaskRepository, TaskRepository>();
 
 builder.Services.AddScoped<IDispatcher, Dispatcher>();
 
+// Service 
+builder.Services.AddScoped<ILogService, ConsoleLogService>();
+builder.Services.AddScoped<IEmailService, ConsoleEmailService>();
 
 // Controllers
 builder.Services.AddControllers();

@@ -11,6 +11,6 @@ namespace Shared.Base.Domain.Mediator
     {
         Task<TResponse> Send<TResponse>(ICommand<TResponse> command, CancellationToken cancellationToken = default);
         Task<TResponse> Query<TResponse>(IQuery<TResponse> query, CancellationToken cancellationToken = default);
-        Task Trigger(IEvent @event, CancellationToken cancellationToken = default);
+        Task Publish(IEvent @event, CancellationToken cancellationToken = default);
     }
 }

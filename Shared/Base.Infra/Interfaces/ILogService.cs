@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shared.Base.Domain.DomainEvent
+namespace Shared.Base.Infra.Interfaces
 {
-    public interface IEvent
+    public interface ILogService
     {
+        Task LogAsync(string message);
     }
 }

@@ -35,7 +35,7 @@ namespace Shared.Base.Domain.Mediator
                 .Invoke(handler, new object[] { query, cancellationToken })!;
         }
 
-        public async Task Trigger(IEvent @event, CancellationToken cancellationToken = default)
+        public async Task Publish(IEvent @event, CancellationToken cancellationToken = default)
         {
             var handlerType = typeof(IEventHandler<>).MakeGenericType(@event.GetType());
             var handlers = _provider.GetServices(handlerType);

@@ -12,28 +12,38 @@ namespace Domain.DomainEvents
     public class TaskDomainEvent { }
     public class TaskCreatedDomainEvent : IEvent
     {
-        public required Guid TaskId { get; init; }
-        public required string Title { get; init; }
-        public required Guid CreatedBy { get; init; }
-        public DateTime? DueDate { get; init; }
-        public AppTaskStatus Status { get; init; }
-        public DateTime OccurredOn { get; init; } = DateTime.UtcNow;
-    }
+        public Guid TaskId { get; }
+        public string Title { get; }
+        public DateTimeOffset OccurredOn { get; } = DateTimeOffset.UtcNow;
 
+        public TaskCreatedDomainEvent(Guid taskId, string title)
+        {
+            TaskId = taskId;
+            Title = title;
+        }
+    }
     public class TaskUpdatedDomainEvent : IEvent
     {
-        public required Guid TaskId { get; init; }
-        public required string Title { get; init; }
-        public DateTime? DueDate { get; init; }
-        public AppTaskStatus Status { get; init; }
-        public DateTime OccurredOn { get; init; } = DateTime.UtcNow;
-    }
+        public Guid TaskId { get; }
+        public string Title { get; }
+        public AppTaskStatus Status { get; }
+        public DateTimeOffset OccurredOn { get; } = DateTimeOffset.UtcNow;
 
-    public class TaskCompletedDomainEvent : IEvent
+        public TaskUpdatedDomainEvent(Guid taskId, string title, AppTaskStatus status)
+        {
+            TaskId = taskId;
+            Title = title;
+            Status = status;
+        }
+    }
+    public class TaskDeletedDomainEvent : IEvent
     {
-        public required Guid TaskId { get; init; }
-        public DateTime OccurredOn { get; init; } = DateTime.UtcNow;
+        public Guid TaskId { get; }
+        public DateTimeOffset OccurredOn { get; } = DateTimeOffset.UtcNow;
+
+        public TaskDeletedDomainEvent(Guid taskId)
+        {
+            TaskId = taskId;
+        }
     }
-
-
 }
