@@ -1,25 +1,32 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Shared.Base.Domain.BaseClass;
+using Shared.Base.Domain.Interface;
+using Shared.Base.Infra.Common.Config;
+using Shared.Base.Infra.Extension;
+using Shared.Base.Share.Interface;
+using System.Reflection;
 
 namespace Shared.Base.Infra.Common.Base
 {
     public abstract class BaseDbContext : DbContext
     {
-        protected BaseDbContext(DbContextOptions options) : base(options)
+        private readonly ContextScanSettings _contextScanSettings;
+
+        protected BaseDbContext(DbContextOptions options, ContextScanSettings? contextScanSettings = null)
+            : base(options)
         {
+            _contextScanSettings = contextScanSettings ?? new ContextScanSettings();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Soft delete global filter
+            foreach (var asm in _contextScanSettings.Assemblies)
+                modelBuilder.ApplyConfigurationsFromAssembly(asm);
+
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
-                if (!entityType.IsOwned() && typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
+                if (typeof(ISoftDeletable).IsAssignableFrom(entityType.ClrType))
                 {
                     entityType.AddSoftDeleteQueryFilter();
                 }
@@ -28,39 +35,60 @@ namespace Shared.Base.Infra.Common.Base
             base.OnModelCreating(modelBuilder);
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public override int SaveChanges()
         {
-            if (optionsBuilder.IsConfigured) return;
-
-            var conn = FormattedConnectionString(GetType());
-            optionsBuilder.UseNpgsql(conn);
-
-            if (GetType().IsAssignableTo(typeof(ReadonlyDbContext)))
-            {
-                optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-            }
-            else
-            {
-                optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.TrackAll);
-            }
-
-            base.OnConfiguring(optionsBuilder);
+            ApplyAuditAndSoftDeleteTracking();
+            return base.SaveChanges();
         }
 
-        public static string FormattedConnectionString(Type dbContextType)
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            if (RuntimeContext.Config.ConnectionStrings == null)
-                throw new InvalidOperationException("Connection strings not configured.");
+            ApplyAuditAndSoftDeleteTracking();
+            return await base.SaveChangesAsync(cancellationToken);
+        }
 
-            var connectionString = RuntimeContext.Config.ConnectionStrings.ReadOnlyDbConnectionString;
-            if (dbContextType.IsAssignableTo(typeof(PrimaryDbContext)))
+        private void ApplyAuditAndSoftDeleteTracking()
+        {
+            var now = DateTimeOffset.UtcNow;
+            var userId = Guid.Empty; 
+
+            foreach (var entry in ChangeTracker.Entries())
             {
-                connectionString = RuntimeContext.Config.ConnectionStrings.PrimaryDbConnectionString;
-            }
+                if (entry.Entity is ICreationTracking creationTrack)
+                {
+                    if (entry.State == EntityState.Added)
+                    {
+                        if (creationTrack.CreatedAt == default)
+                            creationTrack.CreatedAt = now;
+                        if (creationTrack.CreatedBy == Guid.Empty)
+                            creationTrack.CreatedBy = userId;
+                    }
+                }
 
-            return string.Format(connectionString, RuntimeContext.TenantId);
+                if (entry.Entity is IUpdateTracking updateTrack && entry.Entity is IOptimisticLock optimisticLock)
+                {
+                    if (entry.State == EntityState.Modified)
+                    {
+                        updateTrack.UpdatedAt = now;
+                        updateTrack.UpdatedBy = userId;
+                        optimisticLock.UpdateToken = Guid.NewGuid();
+                    }
+                }
+
+                if (entry.Entity is ISoftDeletable softDeletable && entry.State == EntityState.Deleted)
+                {
+                    entry.State = EntityState.Modified;
+                    softDeletable.IsDeleted = true;
+
+                    if (entry.Entity is IUpdateTracking softTrack && entry.Entity is IOptimisticLock softLock)
+                    {
+                        softTrack.UpdatedAt = now;
+                        softTrack.UpdatedBy = userId;
+                        softLock.UpdateToken = Guid.NewGuid();
+                    }
+                }
+            }
         }
     }
-
 
 }

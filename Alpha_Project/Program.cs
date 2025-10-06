@@ -8,6 +8,7 @@ using Infrastructure.Services;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
 using Shared.Base.Domain.Mediator;
+using Shared.Base.Infra.Common.Base;
 using Shared.Base.Infra.Interfaces;
 using System;
 
@@ -28,12 +29,20 @@ builder.Services.Scan(scan => scan
 );
 
 // DbContext
-builder.Services.AddDbContext<AppDbContext>(options =>
+//builder.Services.AddDbContext<AppDbContext>(options =>
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<TaskPrimaryDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddDbContext<TaskReadonlyDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<PrimaryDbContext, TaskPrimaryDbContext>();
+builder.Services.AddScoped<ReadonlyDbContext, TaskReadonlyDbContext>();
 // Repository
-builder.Services.AddScoped<ITaskRepository, TaskRepository>();
-// builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ITaskRepository, TaskRepository2>();
+// builder.Services.AddScoped<IUserRepository, UserRepository>()
 
 builder.Services.AddScoped<IDispatcher, Dispatcher>();
 

@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Shared.Base.Domain;
+using Shared.Base.Domain.BaseClass;
 using Shared.Base.Domain.Mediator;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,6 @@
 ﻿using Domain.DomainEvents;
 using Domain.ValueObjects;
-using Shared.Base.Domain;
+using Shared.Base.Domain.BaseClass;
 using Shared.Base.Domain.DomainEvent;
 using System;
 using System.Collections.Generic;
@@ -11,10 +11,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class TaskEntity : IdEntity<Guid>
+    public class TaskEntity : SoftDeletableFullTrackedEntity
     {
-        public DateTime CreatedAt { get; private set; }
-        public DateTime UpdatedAt { get; private set; }
+        //public DateTime CreatedAt { get; private set; }
+        //public DateTime UpdatedAt { get; private set; }
         public string? Title { get; private set; }
         public DateTime? DueDate { get; private set; }
         public AppTaskStatus Status { get; private set; } = AppTaskStatus.InProgress;

@@ -1,7 +1,7 @@
 ﻿using Domain.Interfaces;
 using Infrastructure.Database;
 using Microsoft.EntityFrameworkCore;
-using Shared.Base.Domain;
+using Shared.Base.Domain.BaseClass;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace Shared.Base.Infra.Common.Base
 {
-    public class ReadonlyDbContext : BaseDbContext
+    public class PrimaryDbContext : BaseDbContext
     {
-        public ReadonlyDbContext(DbContextOptions options, ContextScanSettings? contextScanSettings = null)
-        : base(options, contextScanSettings)
+        public PrimaryDbContext(DbContextOptions options, ContextScanSettings? contextScanSettings = null)
+            : base(options, contextScanSettings)
         {
         }
+
     }
 
 }

@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Base.Share.Interface
 {
-    public interface IUpdateTracking
+    public interface IEntity
     {
-        DateTimeOffset UpdatedAt { get; set; }
-        Guid UpdatedBy { get; set; }
     }
 }
