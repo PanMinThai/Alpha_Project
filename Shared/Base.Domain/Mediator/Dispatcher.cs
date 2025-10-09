@@ -47,6 +47,10 @@ namespace Shared.Base.Domain.Mediator
                     .Invoke(handler, new object[] { @event, cancellationToken })!;
             }
         }
+        public async Task Trigger(IEvent @event, CancellationToken cancellationToken = default)
+        {
+            await Publish(@event, cancellationToken);
+        }
     }
 
 

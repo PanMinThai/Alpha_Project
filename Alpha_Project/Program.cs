@@ -7,12 +7,18 @@ using Infrastructure.Repository;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.EntityFrameworkCore;
+using Shared.Base.API.BaseClass;
+using Shared.Base.API.Interface;
 using Shared.Base.Domain.Mediator;
 using Shared.Base.Infra.Common.Base;
 using Shared.Base.Infra.Interfaces;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
+AppDomain.CurrentDomain.GetAssemblies()
+    .Where(a => !a.IsDynamic && !string.IsNullOrWhiteSpace(a.Location))
+    .ToList()
+    .ForEach(a => _ = a.GetTypes());
 
 // ============= Dependency Injection =============
 builder.Services.Scan(scan => scan
@@ -40,11 +46,13 @@ builder.Services.AddDbContext<TaskReadonlyDbContext>(options =>
 
 builder.Services.AddScoped<PrimaryDbContext, TaskPrimaryDbContext>();
 builder.Services.AddScoped<ReadonlyDbContext, TaskReadonlyDbContext>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 // Repository
 builder.Services.AddScoped<ITaskRepository, TaskRepository2>();
 // builder.Services.AddScoped<IUserRepository, UserRepository>()
 
 builder.Services.AddScoped<IDispatcher, Dispatcher>();
+builder.Services.AddScoped<IDomainEventProcessor, DomainEventProcessor>();
 
 // Service 
 builder.Services.AddScoped<ILogService, ConsoleLogService>();
