@@ -1,4 +1,5 @@
 ﻿using Shared.Base.Domain.DomainEvent;
+using Shared.Base.Domain.Interface;
 using Shared.Base.Share.Interface;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Base.Domain.BaseClass
 {
-    public abstract class IdEntity <TKey> : IEntity
+    public abstract class IdEntity <TKey> : IEntity, IDomainEventEntity
     {
         public TKey Id { get; set; }
         private readonly List<IEvent> _domainEvents = [];

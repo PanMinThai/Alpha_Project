@@ -13,8 +13,6 @@ namespace Domain.Entities
 {
     public class TaskEntity : SoftDeletableFullTrackedEntity
     {
-        //public DateTime CreatedAt { get; private set; }
-        //public DateTime UpdatedAt { get; private set; }
         public string? Title { get; private set; }
         public DateTime? DueDate { get; private set; }
         public AppTaskStatus Status { get; private set; } = AppTaskStatus.InProgress;

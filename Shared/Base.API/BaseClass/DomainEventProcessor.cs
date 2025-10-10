@@ -31,9 +31,7 @@ namespace Shared.Base.API.BaseClass
         {
             foreach (var domainEvent in domainEvents)
             {
-                Console.WriteLine($"🟢 [Executing] Processing domain event: {domainEvent.GetType().Name}");
-                _logger.LogInformation("Executing domain event: {DomainEventName}", domainEvent.GetType().Name);
-
+                Console.WriteLine($"Processing domain event: {domainEvent.GetType().Name} /t [by class DomainEventProcessor]");
                 await _dispatcher.Trigger(domainEvent, cancellationToken);
             }
         }
@@ -42,9 +40,7 @@ namespace Shared.Base.API.BaseClass
         {
             foreach (var domainEvent in domainEvents)
             {
-                Console.WriteLine($"🟢 [Executed] Processing domain event: {domainEvent.GetType().Name}");
-                _logger.LogInformation("Executed domain event: {DomainEventName}", domainEvent.GetType().Name);
-
+                Console.WriteLine($"Processing executed domain event: {domainEvent.GetType().Name} /t [by class DomainEventProcessor]");
                 var handlerType = typeof(IEnumerable<>)
                     .MakeGenericType(typeof(IExecutedDomainEventHandler<>)
                         .MakeGenericType(domainEvent.GetType()));
@@ -65,8 +61,6 @@ namespace Shared.Base.API.BaseClass
                     {
                         var handler = (dynamic)handlerObj;
                         await handler.Handle((dynamic)domainEvent, cancellationToken);
-
-                        Console.WriteLine($"✅ [Handled] {handlerObj.GetType().Name} handled {eventName}");
                     }
                     catch (Exception ex)
                     {
